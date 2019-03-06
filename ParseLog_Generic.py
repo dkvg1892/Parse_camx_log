@@ -1,3 +1,5 @@
+#Author: Deepakkumar Gupta
+
 import re
 import sys
 	
@@ -90,7 +92,6 @@ def get_reg_readhalaec():
     return reg_readhalaec
 	
 def get_reg_print_frame():
-	
 	
     #02-23 07:18:00.429   729  2754 V CamX    : [ VERB][STATS_AEC] caeccore.cpp:1468: printFrameControl CID:0 FID:2 Mode:PerFrame State:Off Lux:240 exifISO:50 (Short, Safe, Long)  G(1.190 1.190 1.190) ET(10000000 10000000 10000000) SI (11902659 11902659 11902659) delta (0.00 0.00 0.00) SensCorrF:1.00 Influence:1.00 LED(1:0 2:0) Ratios(rg:-1.000 bg:-1.000) Entry(First:1.00 Last:0.00) predictive gain 1.00
     #Working
@@ -346,75 +347,6 @@ def plot_graph_Option2(str, readhalaec,printframecontrol):
     show_graph_multi(plt,si_short,si_safe,si_long, "Sensitivity")
     plt.legend()
    
-    plt.show()
-
-def plot_graph(readhalaec,printframecontrol):
-    import numpy as np
-    import matplotlib.pyplot as plt
-    Reqid = []
-    fid = []
-    g_short = []
-    g_safe = []
-    g_long = []
-
-    et_short = []
-    et_safe = []
-    et_long = []
-
-    ae_comp = []
-    
-    for l in readhalaec:
-            ae_comp.append(int(l["AECompensation"]))
-    for l in printframecontrol:
-            g_safe.append(float(l["G_Safe"]))
-            g_short.append(float(l["G_Short"]))
-            g_long.append(float(l["G_Long"]))
-            et_safe.append(int(l["ET_Safe"]))
-            et_short.append(int(l["ET_Short"]))
-            et_long.append(int(l["ET_Long"]))
-
-    plt.figure("EV compensation")	
-    plt.title("EV Compensation Graph")
-    plt.subplot(311)
-    plt.plot(np.arange(len(ae_comp)),ae_comp)
-    plt.xlabel("Request ID")
-    plt.ylabel("AE compensation")
-    #plt.tick_params(
-    #    axis='x',          # changes apply to the x-axis
-    #    which='both',      # both major and minor ticks are affected
-    #    bottom=False,      # ticks along the bottom edge are off
-    #    top=False,         # ticks along the top edge are off
-    #    labelbottom=False) # labels along the bottom edge are off
-    #plt.show()
-    plt.xticks(np.arange(0,len(ae_comp),20))
-    plt.plot(np.arange(len(g_short)),g_safe, label="Short")
-    plt.plot(np.arange(len(g_safe)),g_safe, label="Safe")
-    plt.plot(np.arange(len(g_long)),g_long, label="Long")
-    
-    
-    plt.subplot(312)
-    #plt.plot(p1,p2, label="Short")
-    plt.plot(np.arange(len(g_short)),g_safe, label="Short")
-    plt.plot(np.arange(len(g_safe)),g_safe, label="Safe")
-    plt.plot(np.arange(len(g_long)),g_long, label="Long")
-    #plt.plot(fid,gain)
-    plt.xlabel("Request ID")
-    plt.xticks(np.arange(0,len(g_long),20))
-    plt.ylabel("Gain")
-    
-    plt.legend()
-    
-    plt.subplot(313)
-    plt.plot(np.arange(len(et_short)),et_short, label="Short")
-    plt.plot(np.arange(len(et_safe)),et_safe, label="Safe")
-    plt.plot(np.arange(len(et_long)),et_long, label="Long")
-    #plt.plot(fid,gain)
-    plt.xlabel("Request ID")
-    plt.ylabel("Exposure time")
-    plt.xticks(np.arange(0,len(et_long),20))
-    plt.legend()
-    
-    
     plt.show()
 
 if __name__ == "__main__":
