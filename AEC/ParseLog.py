@@ -145,9 +145,9 @@ def get_reg_print_frame():
     \s+\d+:
     (?P<LED2>\d+)
     \)\s+Ratios\(rg:
-    (?P<rg>[-]\d+\.\d+)
+    (?P<rg>(-\d+\.\d+)|(\d+\.\d+))
     \s+bg:
-    (?P<bg>[-]\d+\.\d+)
+    (?P<bg>(-\d+\.\d+)|(\d+\.\d+))
     \)\s+Entry\(First:
     (?P<First>(\d+\.\d+)|([-]\d+\.\d+))
     \s+Last:
@@ -157,6 +157,7 @@ def get_reg_print_frame():
     """
     #pattern = re.compile(reg_print_frame, re.VERBOSE)
     #line = "02-18 13:50:57.659   651  1935 V CamX    : [ VERB][STATS_AEC] caeccore.cpp:1432: printFrameControl CID:0 FID:16 Mode:PerFrame State:Off Lux:321 exifISO:250 (Short, Safe, Long)  G(2.387 2.387 2.387) ET(10000000 10000000 10000000) SI (23873946 23873946 23873946) delta (-2.02 -2.02 -2.02) SensCorrF:1.00 Influence:1.00 LED(1:0 2:0) Ratios(rg:-1.000 bg:-1.000) Entry(First:1.00 Last:0.00) predictive gain 1.00"
+	#line = "12-10 22:13:48.048   734  2063 V CamX    : [ VERB][STATS_AEC] caeccore.cpp:1412: printFrameControl CID:0 FID:1 Mode:PerFrame State:Off Lux:240 exifISO:64 (Short, Safe, Long)  G(1.428 1.428 1.428) ET(8333333 8333333 8333333) SI (11902660 11902660 11902660) delta (0.00 0.00 0.00) SensCorrF:1.00 Influence:1.00 LED(1:0 2:0) Ratios(rg:-1.000 bg:-1.000) Entry(First:1.00 Last:0.00) predictive gain 1.00
     #print(pattern.search(line).groupdict())
     
     return reg_print_frame
@@ -208,10 +209,13 @@ def parse_file(file_name):
                 readhalaec.append(dict)
             if match2 is not None:
                 dict = match2.groupdict()
+                #print(dict)
+                #print(line)
                 printframecontrol.append(dict)
 
     #print(readhalaec)
     #print(printframecontrol)
+	#print(len(readhalaec),len(printframecontrol))
     return readhalaec, printframecontrol
 
 def show_graph_multi(plt, short,safe,long,yaxis_name):
