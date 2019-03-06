@@ -177,7 +177,7 @@ def main():
     file_name = sys.argv[1]
     readhalaec, printframecontrol = parse_file(file_name)
     if len(readhalaec) == 0 or len(printframecontrol) == 0:
-        print("Requied logs are missing from file")
+        print("Required logs are missing from file")
         exit(-1)
     print_menu()
     choice = input("Select any one option: ")
@@ -191,7 +191,7 @@ def main():
     elif choice == 3:
         plot_graph_Option("AEAntibandingModeValue",readhalaec,printframecontrol)
     else :
-        print("Invalid choice")
+        print("Invalid option selected")
 
 def parse_file(file_name):
     readhalaec = []
