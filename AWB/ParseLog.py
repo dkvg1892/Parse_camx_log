@@ -1,114 +1,94 @@
-import re
+#Author: Deepakkumar Gupta
+
+
 import sys
-	
-def get_reg_PublishFrameControl():
-    #Working
-    reg_PublishFrameControl = r"""
-    \d+-\d+\s+\d+:\d+:\d+\.\d+\s+\d+\s+\d+\s+\w+\s+\w+\s+:\s+
-    \[\s+\w+\]
-    \[\w+\]\s+camxcawbioutil\.cpp:\d+\s+
-    (?P<Function>PublishFrameControlToMainMetadata)
-    \(\)\s+\w+\s+\w+\s+\w+\s+\w+:\s+
-    (?P<ReqId>\d+)
-    \s+\w+:
-    (?P<camID>\d+)
-    \s+\w+\(\w+:
-    (?P<Gain_R>(\d+\.\d+)|([-]\d+\.\d+))
-    ,\s+\w+:
-    (?P<Gain_G>(\d+\.\d+)|([-]\d+\.\d+))
-    ,\s+\w+:
-    (?P<Gain_B>(\d+\.\d+)|([-]\d+\.\d+))    
-    \)\s+\w+\(
-    (?P<CCT>\d+)
-    \),\s+\w+:\(\w+/\w+:
-    (?P<R_G_Ratio>(\d+\.\d+)|([-]\d+\.\d+))    
-    \s+\w+\/\w+:
-    (?P<B_G_Ratio>(\d+\.\d+)|([-]\d+\.\d+))    
-    \)\s+\w+:\s+
-    (?P<FlashState>\d+)
-    """
-    #pattern = re.compile(reg_PublishFrameControl, re.VERBOSE)
-    #line = "02-21 09:16:36.973   720  2503 I CamX    : [ INFO][STATS_AWB] camxcawbioutil.cpp:2311 PublishFrameControlToMainMetadata() Published PropertyIDAWBFrameControl for reqID: 1 camId:0 Gain(R:1.953914, G:1.000000, B:1.708272) CCT(4593), Decision_AfterTC:(R/G:0.511793 B/G:0.585387) FlashState: 0"
-    #print(pattern.search(line))
-    
-    return reg_PublishFrameControl
-	
-def print_menu():
+import awb_common as awb	
+
+def print_main_menu():
     print("="*60)
     print(" "*20+"AWB LOG PARSING")
     print("="*60)
-    
+
+def ask_for_cameraID(cid_avail):
+    cid_to_display = input("Enter camera ID (Enter -1 to display graph for all available camera): ")
+    cid_to_use = []
+    if cid_to_display != -1 and (cid_to_display < 0 or cid_to_display > 5  or cid_avail[cid_to_display] == 0):
+        print("Please select valid camera ID or logs not available for selected camera ID")
+        exit(-1)
+
+    if cid_to_display != -1:
+        for i in range(len(cid_avail)):
+            cid_to_use.append(0)
+        cid_to_use[cid_to_display] = 1
+    else:
+        cid_to_use = cid_avail
+    return cid_to_use
+
 def main():
     if len(sys.argv) != 2 :
         print("Please provide file name as an arguement")
         exit(-1)
     file_name = sys.argv[1]
-    publishcontrol = parse_file(file_name)
+    cid_avail, publishcontrol = awb.parse_file(file_name)
     if len(publishcontrol) == 0:
         print("Required logs are missing from file")
         exit(-1)
-    print_menu()
-    choice = 0
-    #choice = input("Select any one option: ")
+    while True:
+        print_main_menu()
+        cid_to_use= ask_for_cameraID(cid_avail)
+        plot_graph_default(cid_to_use,["Gain_R","Gain_G","Gain_B","CCT"],publishcontrol)
+        run_again = input("Do you want to plot more graphs (YES: 1 or NO: 0): ")
+        if run_again == 0:
+            break
 
-    if choice == 0:
-        plot_graph_default(publishcontrol)
-    else :
-        print("Invalid choice")
 
-def parse_file(file_name):
-    PublishFrameControl = []
-    pattern_PublishFrameControl = re.compile(get_reg_PublishFrameControl(), re.VERBOSE)
-    with open(file_name) as infile:
-        for line in infile:
-            match1 = pattern_PublishFrameControl.search(line)
-            if match1 is not None:
-                #print(line)
-                dict = match1.groupdict()
-                PublishFrameControl.append(dict)
-
-    #print(PublishFrameControl)
-    return PublishFrameControl
-
-def show_graph_multi(plt, r,g,b,yaxis_name):
+def show_graph_multi(cid_avail,plt, short,safe,longs,yaxis_name):
     import numpy as np
-    plt.plot(np.arange(len(r)),r, label="Red",color="red")
-    plt.plot(np.arange(len(g)),g, label="Green",color="green")
-    plt.plot(np.arange(len(b)),b, label="Blue",color="blue")
+    i = 0
+    length = 0
+    for z in zip(short,safe,longs):
+
+        if cid_avail[i] == 1:
+    
+            plt.plot(np.arange(len(z[0])),z[0], label="CID:"+str(i)+" Red")
+            plt.plot(np.arange(len(z[1])),z[1], label="CID:"+str(i)+" Green")
+            plt.plot(np.arange(len(z[2])),z[2], label="CID:"+str(i)+" Blue")
+            length = max(length,len(z[2]))
+        i = i+1
+        
     plt.xlabel("Request ID")
-    plt.xticks(np.arange(0,len(b),20))
+    plt.xticks(np.arange(0,length,20))
     plt.ylabel(yaxis_name)
     plt.legend()
 
-def show_graph_single(plt, values ,yaxis_name, label_name):
+def show_graph_single(cid_avail,plt, values ,yaxis_name, label_name):
     import numpy as np
-    plt.plot(np.arange(len(values)),values, label=label_name)
+    i=0
+    length = 0
+    for l in values:
+        if cid_avail[i] == 1:
+            plt.plot(np.arange(len(l)),l, label="CID:"+str(i)+" "+label_name)
+            length = max(length,len(l))
+        i=i+1
     plt.xlabel("Request ID")
-    plt.xticks(np.arange(0,len(values),20))
+    plt.xticks(np.arange(0,length,20))
     plt.ylabel(yaxis_name)
     plt.legend()
+    
 
-def plot_graph_default(publichcontrol):
+def plot_graph_default(cid_avail,var,publishcontrol):
     import matplotlib.pyplot as plt
-    
-    r = []
-    g = []
-    b = []
-    c = []
-    
-    for l in publichcontrol:
-            r.append(float(l["Gain_R"]))
-            g.append(float(l["Gain_G"]))
-            b.append(float(l["Gain_B"]))
-            c.append(int(l["CCT"]))
-    
+    g_et = []
+    for v in var:
+        g_et.append(awb.get_data(publishcontrol,v,1))
+    print("Please wait, generating graph ... ")
     plt.figure("Default Graph")	
     
     plt.subplot(211)
-    show_graph_multi(plt,r,g,b, "RGB Gains")
+    show_graph_multi(cid_avail,plt,g_et[0],g_et[1],g_et[2], "RGB Gains")
     
     plt.subplot(212)
-    show_graph_single(plt,c,"CCT","CCT")
+    show_graph_single(cid_avail,plt,g_et[3], "CCT","CCT")
     plt.legend()
    
     plt.show()
