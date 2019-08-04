@@ -13,13 +13,13 @@ def get_reg_readhalaec():
     ,\s+\w+:
     (?P<CID>\d+)
     ,\s+\w+:
-    (?P<AECompensation>(\-\d+)|(\d+))
+    (?P<AE_Compensation>(\-\d+)|(\d+))
     ,\s+\w+:
     (?P<AELock>(\-\d+)|(\d+))
     ,\s+\w+:
     (?P<AEMode>\d+)
     ,\s+\w+:
-    (?P<AEMeteringMode>\d+)
+    (?P<AE_Metering_Mode>\d+)
     ,\s+\w+:
     (?P<AETrigger>\d+)
     ,\s+\w+:
@@ -37,7 +37,7 @@ def get_reg_readhalaec():
     ,\s+\w+:
     (?P<sensitivity>\d+)
     ,\s+\w+:
-    (?P<AEAntibandingModeValue>\d+)
+    (?P<AE_Antibanding_Mode>\d+)
     ,\s+\w+:
     (?P<ISOExpTimePrioritySet>\d+)
     ,\s+\w+:
@@ -159,54 +159,155 @@ def get_reg_print_frame():
     #print(pattern.search(line).groupdict())
     
     return reg_print_frame
+def get_reg_mtr_out():
+
+    #05-14 12:35:57.848   856  1933 V CamX    : [ VERB][STATS_AEC] caeccore.cpp:1054: runMetering MtrOut:CID:2,Frame:10, Lux:366.856, Luma(Final:18.016, Avg:20.143, Mtr:18.016), (Short, Safe, Long)Targets(58, 58, 58) ExpIndex(385.9,385.9,385.9)
+    #Working
+    reg_mtr_out= r"""
+    \d+-\d+\s+\d+:\d+:\d+\.\d+\s+\d+\s+\d+\s+V\s+CamX\s+:\s+
+    \[\s+\w+\]
+    \[\w+\]\s+caeccore\.cpp:\d+:\s+
+    (?P<Function>runMetering)
+    \s+\w+:\w+:
+    (?P<CID>\d+)
+    \,\w+:
+    (?P<FID>\d+)
+    \,\s+\w+:
+    (?P<Lux_Index>\d+\.\d+)
+    \,\s+\w+\(\w+:
+    (?P<Final_Luma>\d+\.\d+)
+    \,\s+\w+:
+    (?P<Avg_Luma>\d+\.\d+)
+    \,\s+\w+:
+    (?P<Mtr_Luma>\d+\.\d+)
+    \)\,\s+\(\w+\,\s+\w+\,\s+\w+\)\w+\(
+    (?P<Short_target>\d+)
+    \,\s+
+    (?P<Safe_target>\d+)
+    \,\s+
+    (?P<Long_target>\d+)
+    \)\s+\w+\(
+    (?P<EI_Short>\d+\.\d+)
+    \,
+    (?P<EI_Safe>\d+\.\d+)
+    \,
+    (?P<EI_Long>\d+\.\d+)
+    \)
+    """
+    # pattern = re.compile(reg_mtr_out, re.VERBOSE)
+    # line = "05-14 12:35:57.848   856  1933 V CamX    : [ VERB][STATS_AEC] caeccore.cpp:1054: runMetering MtrOut:CID:2,Frame:10, Lux:366.856, Luma(Final:18.016, Avg:20.143, Mtr:18.016), (Short, Safe, Long) Targets(58, 58, 58) ExpIndex(385.9,385.9,385.9)"
+    # print(pattern.search(line).groupdict())
+    return reg_mtr_out
+
+def get_reg_conv_out():
+
+    #05-12 15:23:09.461   647  1815 V CamX    : [ VERB][STATS_AEC] caeccore.cpp:1095: runConvergence ConvOut:CID 1 Frame 45 Settle 1 BrightSettle 1, prevEV 0.0 (Short, Safe, Long) ExpIndex 320.0 320.0 320.0  Adjust 0.0 0.0 0.0 mode 1 lock 0
+    #Working
+    reg_conv_out= r"""
+    \d+-\d+\s+\d+:\d+:\d+\.\d+\s+\d+\s+\d+\s+V\s+CamX\s+:\s+
+    \[\s+\w+\]
+    \[\w+\]\s+caeccore\.cpp:\d+:\s+
+    (?P<Function>runConvergence)
+    \s+\w+:\w+\s+
+    (?P<CID>\d+)
+    \s+\w+\s+
+    (?P<FID>\d+)
+    \s+\w+\s+
+    (?P<Settle>\d+)
+    """
+    #pattern = re.compile(reg_conv_out, re.VERBOSE)
+    #line = "05-12 15:23:09.461   647  1815 V CamX    : [ VERB][STATS_AEC] caeccore.cpp:1095: runConvergence ConvOut:CID 1 Frame 45 Settle 1 BrightSettle 1, prevEV 0.0 (Short, Safe, Long) ExpIndex 320.0 320.0 320.0  Adjust 0.0 0.0 0.0 mode 1 lock 0"
+    #print(pattern.search(line).groupdict())
+    return reg_conv_out
+
 def get_empty_readhalaec_dict():
-    dicts = {'AECompensation': '0', 'FPS_Range_min': '0', 'face_dy': '0', 'face_dx': '0', 'sensitivity': '0', 'FPS_Range_max': '0', 'captureIntent': '0', 'AFTrigger': '0', 'AELock': '0', 'AEAntibandingModeValue': '0', 'Function': 'ReadHALAECParam', 'ISOExpTimePrioritySet': '0', 'ISOValue': '0', 'ZSLEnable': '0', 'AETrigger': '0', 'face_count': '0', 'controlSceneMode': '0', 'Gain': '0.000000', 'ISOorExposureTimePriorityValue': '0', 'exposureTime': '0', 'CID': '0', 'Touch_y': '0.000000', 'Touch_x': '0.000000', 'AEMeteringMode': '0', 'face_x': '0', 'ReqId': '0', 'videoHDRType': '0', 'controlMode': '0', 'face_y': '0', 'Touch_dx': '0.000000', 'Touch_dy': '0.000000', 'FrameDuration': '0', 'flashMode': '0', 'AEMode': '0', 'AEBracketMode': '0'}
+    dicts = {'AE_Compensation': '0', 'FPS_Range_min': '0', 'face_dy': '0', 'face_dx': '0', 'sensitivity': '0', 'FPS_Range_max': '0', 'captureIntent': '0', 'AFTrigger': '0', 'AELock': '0', 'AE_Antibanding_Mode': '0', 'Function': 'ReadHALAECParam', 'ISOExpTimePrioritySet': '0', 'ISOValue': '0', 'ZSLEnable': '0', 'AETrigger': '0', 'face_count': '0', 'controlSceneMode': '0', 'Gain': '0.000000', 'ISOorExposureTimePriorityValue': '0', 'exposureTime': '0', 'CID': '0', 'Touch_y': '0.000000', 'Touch_x': '0.000000', 'AE_Metering_Mode': '0', 'face_x': '0', 'ReqId': '0', 'videoHDRType': '0', 'controlMode': '0', 'face_y': '0', 'Touch_dx': '0.000000', 'Touch_dy': '0.000000', 'FrameDuration': '0', 'flashMode': '0', 'AEMode': '0', 'AEBracketMode': '0'}
     return dicts
 
 def get_empty_printframecontrol_dict():
     dicts = {'CID': '0', 'Lux': '0', 'ET_Long': '0', 'exifISO': '0', 'LED2': '0', 'Function': 'printFrameControl', 'delta_Safe': '0.00', 'SI_Safe': '0', 'G_Short': '0.0', 'rg': '0.000', 'SensCorrF': '0.00', 'ET_Short': '0', 'G_Safe': '0.0', 'LED1': '0', 'bg': '0.000', 'Last': '0.00', 'ET_Safe': '0', 'G_Long': '0.0', 'FID': '0', 'SI_Short': '0', 'First': '0.00', 'Predictive_gain': '0.00', 'Influence': '0.00', 'State': 'Off', 'delta_Short': '0.00', 'delta_Long': '0.00', 'SI_Long': '0'}
     return dicts
 
+def get_empty_mtrout_dict():
+    dicts = {'Function': 'runMetering', 'Short_target': '0', 'Safe_target': '0', 'CID': '0', 'Lux_Index': '0.00', 'Long_target': '0', 'EI_Safe': '0.00', 'EI_Long': '0.00', 'Final_Luma': '0.00', 'Mtr_Luma': '0.00', 'FID': '0', 'Avg_Luma': '0.00', 'EI_Short': '0.00'}
+    return dicts
+
+def get_empty_convout_dict():
+    dicts = {'Function': 'runConvergence', 'Settle': '0', 'FID': '0', 'CID': '0'}
+    return dicts
 def parse_file(file_name):
+    #get_reg_mtr_out()
+    #get_reg_conv_out()
     readhalaec = [get_empty_readhalaec_dict()]
     printframecontrol = [get_empty_printframecontrol_dict()]
+    mtrout = [get_empty_mtrout_dict()]
+    convout = [get_empty_convout_dict()]
     cid_avail = [0,0,0,0,0,0]  #assuming max six camera id available in log
+    settled = [{0,0}]
     pattern_readhalaec = re.compile(get_reg_readhalaec(), re.VERBOSE)
     pattern_printframecontrol = re.compile(get_reg_print_frame(), re.VERBOSE)
+    pattern_mtrout = re.compile(get_reg_mtr_out(), re.VERBOSE)
+    pattern_convout = re.compile(get_reg_conv_out(), re.VERBOSE)
     next_line = 0
     with open(file_name) as infile:
         for line in infile:
             match1 = pattern_readhalaec.search(line)
-            match2 = pattern_printframecontrol.search(line)
+            match2 = pattern_mtrout.search(line)
+            match3 = pattern_printframecontrol.search(line)
+            match4 = pattern_convout.search(line)
             if match1 is not None:
                 dict = match1.groupdict()
                 readhalaec.append(dict)
                 cid_avail[int(dict["CID"])] = 1
                 if next_line == 1:
                     printframecontrol.append(printframecontrol[-1])
+                    mtrout.append(mtrout[-1])
+                if next_line == 2:
+                    printframecontrol.append(printframecontrol[-1])
                 next_line = 1
             if match2 is not None:
                 dict = match2.groupdict()
-                printframecontrol.append(dict)
+                mtrout.append(dict)
                 if next_line == 0:
                     readhalaec.append(readhalaec[-1])
+                if next_line == 2:
+                    readhalaec.append(readhalaec[-1])
+                    printframecontrol.append(printframecontrol[-1])
+                next_line = 2
+            if match3 is not None:
+                dict = match3.groupdict()
+                printframecontrol.append(dict)
+                if next_line == 1:
+                    mtrout.append(mtrout[-1])
+                if next_line == 0:
+                    readhalaec.append(readhalaec[-1])
+                    mtrout.append(mtrout[-1])
                 next_line = 0
-    #print(len(readhalaec),len(printframecontrol))
-    return cid_avail, readhalaec[1:], printframecontrol[1:]
+            if match4 is not None:
+                dict = match4.groupdict()
+                convout.append(dict)
+    #print(len(readhalaec),len(printframecontrol), len(mtrout))
+    #print(mtrout)
+    return cid_avail, readhalaec[1:], printframecontrol[1:], mtrout[1:]
 
 def fill_empty_data(*argv):
     for arg in argv:
         for a in arg:
-            a.append(-1)
+            if len(a) == 0:
+                a.append(-1)
+            else:
+                a.append(a[-1])
 
-def get_data(dictionary, var_name,var_type):
+def get_data(dictionary, var_name):
     var = [[],[],[],[],[],[]]
     for l in dictionary:
+        #print(l)
         cid = int(l["CID"])
         fill_empty_data(var)
-        if var_type == 0: #int
+        val = l[var_name]
+        if val.find('.') == -1:
             var[cid][-1] = int(l[var_name])
-        elif var_type == 1: #float
+        else:
             var[cid][-1] = float(l[var_name])
     return var
     
